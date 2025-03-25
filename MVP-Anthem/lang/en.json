@@ -1,0 +1,23 @@
+{
+    "prefix": "{darkblue}[MVP Anthem]:{default} ",
+    "mvp<mainmenu>": "MVP Anthem",
+    "mvp<equip>": "Equip [ {0} ] ?",
+    "preview<option>": "No, Preview it first",
+    "volume<option>": "Change Volume",
+    "mvp<option>": "Select MVP",
+    "categories<menu>": "Select A Category",
+    "volume<menu>": "Select Your Volume",
+    "equip<yes>": "Yes",
+    "mvp<currentmvp>": "Current MVP: {0}",
+    "mvp<currentvolume>": "Current Volume: {0}",
+
+    "volume.selected": "Your MVP volume is now set to: {0}",
+    "mvp.equipped": "You succesfully equipped {red}{0}{default} MVP!",
+    "mvp.previewed": "Playing {red}{0}{default} for you",
+    "preview.no.volume": "Your volume is set to 0. So you can't preview any MVP!",
+
+    "mvp.1.chat": "{red}{0}{default} is the MVP of the round! Playing: {blue}{1}{default}.",
+    "mvp.1.html": "<font color='red'>{0}</font> IS the MVP of the round!<br><b color='white'>━━━━━━━━━━━━━━━━━━━━━━━━<</b><br><img src='https://raw.githubusercontent.com/T3Marius/GIFS-Repository/refs/heads/main/Flawless_4k.gif'></img>",
+    "mvp.2.chat": "{red}{0}{default} is the MVP of the round! Playing: {blue}{1}{default}.",
+    "mvp.2.html": "<font color='red'>{0}</font> IS the MVP of the round!<br><b color='white'>━━━━━━━━━━━━━━━━━━━━━━━━<</b>Playing: <font color='blue'>{1}</font>"
+}
