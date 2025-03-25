@@ -3,6 +3,7 @@
 # Requirements
 - **[** [**CounterStrikeSharp**](https://github.com/roflmuffin/CounterStrikeSharp) **]**
 - **[** [**MultiAddonManager**](https://github.com/Source2ZE/MultiAddonManager) **]**
+- **[** [**CS2ScreenMenuAPI**](https://github.com/T3Marius/CS2ScreenMenuAPI) **]**
 - **[** [**ClientPrefsAPI**](https://github.com/Cruze03/Clientprefs) **]**
 
 ## You use for testing my WorkshopAddon: **[** [**Workshop**](https://steamcommunity.com/sharedfiles/filedetails/?id=3450055137) **]**
