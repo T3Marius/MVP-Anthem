@@ -5,7 +5,7 @@
 - **[** [**MultiAddonManager**](https://github.com/Source2ZE/MultiAddonManager) **]**
 - **[** [**ClientPrefsAPI**](https://github.com/Cruze03/Clientprefs) **]**
 
-##You use for testing my WorkshopAddon: **[** [**Workshop**](https://steamcommunity.com/sharedfiles/filedetails/?id=3450055137) **]**
+## You use for testing my WorkshopAddon: **[** [**Workshop**](https://steamcommunity.com/sharedfiles/filedetails/?id=3450055137) **]**
 - Just add the addon id in multiaddongmanager.cfg and you can use the 2 mvp's.
 
 # Basic Config:
@@ -67,6 +67,7 @@ Flags = []
 ```
 
 If you wanna ask about the plugin or support me contact me here:
+
 Discord: mariust3
 
 Donations:

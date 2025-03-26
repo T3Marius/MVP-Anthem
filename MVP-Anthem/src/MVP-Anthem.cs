@@ -1,13 +1,4 @@
 ﻿using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Core.Attributes.Registration;
-using CounterStrikeSharp.API.Core.Translations;
-using CounterStrikeSharp.API.Modules.Admin;
-using CounterStrikeSharp.API.Modules.Commands;
-using CounterStrikeSharp.API.Modules.Extensions;
-using CounterStrikeSharp.API.Modules.Utils;
-using CS2ScreenMenuAPI.Internal;
-using Microsoft.Extensions.Logging;
-using static MVPAnthem.Lib;
 
 namespace MVPAnthem;
 
