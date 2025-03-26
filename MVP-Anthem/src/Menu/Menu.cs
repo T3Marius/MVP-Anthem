@@ -4,6 +4,7 @@ using CounterStrikeSharp.API.Core;
 using CS2ScreenMenuAPI.Internal;
 using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Utils;
+using CS2ScreenMenuAPI;
 
 namespace MVPAnthem;
 
@@ -40,6 +41,36 @@ public static class Menu
         }
         mainMenu.AddOption(" ", (p, o) => { }, true);
 
+        if (Instance.playerMVPCookies.TryGetValue(player, out string? activeMvp) && !string.IsNullOrEmpty(activeMvp))
+        {
+            mainMenu.AddOption(Instance.Localizer.ForPlayer(player, "mvp<remove>"), (p, option) =>
+            {
+                ScreenMenu confirmMenu = new ScreenMenu(Instance.Localizer.ForPlayer(p, "mvp<remove.confirm>"), Instance)
+                {
+                    IsSubMenu = true,
+                    ParentMenu = mainMenu,
+                };
+
+                confirmMenu.AddOption(Instance.Localizer.ForPlayer(p, "remove<yes>"), (p, option) =>
+                {
+                    if (Instance.CLIENT_PREFS_API != null && Instance.MVPCookie != -1)
+                    {
+                        Instance.CLIENT_PREFS_API.SetPlayerCookie(p, Instance.MVPCookie, string.Empty);
+                        if (Instance.playerMVPCookies.ContainsKey(p))
+                        {
+                            Instance.playerMVPCookies.Remove(p);
+                        }
+                        p.PrintToChat(Instance.Localizer["prefix"] + Instance.Localizer["mvp.removed"]);
+                        MenuAPI.CloseActiveMenu(p);
+                    }
+                });
+                confirmMenu.AddOption(Instance.Localizer.ForPlayer(p, "remove<no>"), (p, option) =>
+                {
+                    MenuAPI.OpenMenu(Instance, p, mainMenu);
+                });
+                confirmMenu.Open(p);
+            });
+        }
         mainMenu.AddOption(Instance.Localizer.ForPlayer(player, "volume<option>"), (p, option) =>
         {
             ScreenMenu volumeMenu = new ScreenMenu(Instance.Localizer.ForPlayer(p, "volume<menu>"), Instance)
