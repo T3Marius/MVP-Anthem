@@ -2,6 +2,10 @@
     "prefix": "{darkblue}[MVP Anthem]:{default} ",
     "mvp<mainmenu>": "MVP Anthem",
     "mvp<equip>": "Equip [ {0} ] ?",
+    "mvp<remove>": "Remove MVP",
+    "mvp<remove.confirm>": "Are you sure you wanna remove the MVP?",
+    "remove<yes>": "Yes",
+    "remove<no>": "No",
     "preview<option>": "No, Preview it first",
     "volume<option>": "Change Volume",
     "mvp<option>": "Select MVP",
@@ -14,6 +18,7 @@
     "volume.selected": "Your MVP volume is now set to: {0}",
     "mvp.equipped": "You succesfully equipped {red}{0}{default} MVP!",
     "mvp.previewed": "Playing {red}{0}{default} for you",
+    "mvp.removed": "Your active MVP has been removed.",
     "preview.no.volume": "Your volume is set to 0. So you can't preview any MVP!",
 
     "mvp.1.chat": "{red}{0}{default} is the MVP of the round! Playing: {blue}{1}{default}.",
