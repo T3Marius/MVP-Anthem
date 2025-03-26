@@ -34,17 +34,41 @@ public static class Events
         if (player == null)
             return HookResult.Continue;
 
-        if (Instance.playerVolumeCookies.TryGetValue(player, out string? currentVolume) && string.IsNullOrEmpty(currentVolume))
+        Instance.AddTimer(3.0f, () =>
         {
-            float defaultVolume = Instance.Config.Settings.DefaultVolume;
-
-            if (Instance.CLIENT_PREFS_API != null && Instance.VolumeCookie != -1)
+            if (!Instance.playerVolumeCookies.TryGetValue(player, out string? currentVolume) && string.IsNullOrEmpty(currentVolume))
             {
-                Instance.CLIENT_PREFS_API.SetPlayerCookie(player, Instance.VolumeCookie, currentVolume.ToString());
-                Instance.playerMVPCookies[player] = currentVolume.ToString();
-            }
-        }
+                float defaultVolume = Instance.Config.Settings.DefaultVolume;
 
+                if (Instance.CLIENT_PREFS_API != null && Instance.VolumeCookie != -1)
+                {
+                    Instance.CLIENT_PREFS_API.SetPlayerCookie(player, Instance.VolumeCookie, defaultVolume.ToString());
+                    Instance.playerMVPCookies[player] = defaultVolume.ToString();
+                }
+            }
+            if (Instance.Config.Settings.GiveRandomMVP)
+            {
+                if (!Instance.playerMVPCookies.TryGetValue(player, out string? randomMvp) || string.IsNullOrEmpty(randomMvp))
+                {
+                    var allMvps = Instance.Config.MVPSettings
+                        .SelectMany(category => category.Value)
+                        .ToList();
+
+                    if (allMvps.Any())
+                    {
+                        var randomMvpEntry = allMvps[new Random().Next(allMvps.Count)];
+
+                        string newMvpCookie = $"{randomMvpEntry.Value.MVPName};{randomMvpEntry.Value.MVPSound}";
+
+                        if (Instance.CLIENT_PREFS_API != null && Instance.MVPCookie != -1)
+                        {
+                            Instance.CLIENT_PREFS_API.SetPlayerCookie(player, Instance.MVPCookie, newMvpCookie);
+                            Instance.playerMVPCookies[player] = newMvpCookie;
+                        }
+                    }
+                }
+            }
+        });
 
         return HookResult.Continue;
     }
@@ -85,7 +109,6 @@ public static class Events
                 }
             }
         }
-
         if (!string.IsNullOrEmpty(mvpSound) && !string.IsNullOrEmpty(mvpKey))
         {
             MVP_Settings? mvpSettings = null;
