@@ -15,7 +15,10 @@ public static class Menu
         if (player == null)
             return;
 
-        ScreenMenu mainMenu = new ScreenMenu(Instance.Localizer.ForPlayer(player, "mvp<mainmenu>"), Instance);
+        ScreenMenu mainMenu = new ScreenMenu(Instance.Localizer.ForPlayer(player, "mvp<mainmenu>"), Instance)
+        {
+            EnableDisabledOptionsCount = false,
+        };
         if (Instance.playerMVPCookies.TryGetValue(player, out string? mvpCookie) && !string.IsNullOrEmpty(mvpCookie))
         {
             string[] parts = mvpCookie.Split(';');

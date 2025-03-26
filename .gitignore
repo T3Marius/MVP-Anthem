@@ -47,3 +47,4 @@ MVP-Anthem/bin/Release/addons/counterstrikesharp/plugins/MVP-Anthem/Tomlyn.dll
 MVP-Anthem/bin/Release/addons/counterstrikesharp/plugins/MVP-Anthem/lang/en.json
 .vs/MVP-Anthem/FileContentIndex/bbc8e30a-8a66-4060-bc6b-64602b041f13.vsidx
 .vs/MVP-Anthem/FileContentIndex/6c4aa305-1544-4b7d-b581-957cc323b33d.vsidx
+*.vsidx
