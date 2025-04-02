@@ -1,11 +1,8 @@
 ﻿using static MVPAnthem.MVPAnthem;
 using static MVPAnthem.Lib;
 using CounterStrikeSharp.API.Core;
-using CS2ScreenMenuAPI.Internal;
 using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Utils;
-using CS2ScreenMenuAPI;
-
 namespace MVPAnthem;
 
 public static class Menu
@@ -14,17 +11,20 @@ public static class Menu
     {
         if (player == null)
             return;
-
-        ScreenMenu mainMenu = new ScreenMenu(Instance.Localizer.ForPlayer(player, "mvp<mainmenu>"), Instance)
+        
+        var mainMenu = new CS2ScreenMenuAPI.Menu(player, Instance)
         {
-            EnableDisabledOptionsCount = false,
+            Title = Instance.Localizer.ForPlayer(player, "mvp<mainmenu>"),
+            ShowDisabledOptionNum = false,
         };
+
         if (Instance.playerMVPCookies.TryGetValue(player, out string? mvpCookie) && !string.IsNullOrEmpty(mvpCookie))
         {
             string[] parts = mvpCookie.Split(';');
             string displayMVP = parts.Length > 0 ? parts[0] : mvpCookie;
-            mainMenu.AddOption(Instance.Localizer.ForPlayer(player, "mvp<currentmvp>", displayMVP), (p, o) => { }, true);
+            mainMenu.AddItem(Instance.Localizer.ForPlayer(player, "mvp<currentmvp>", displayMVP), (p, o) => { }, true);
         }
+
         if (Instance.playerVolumeCookies.TryGetValue(player, out string? currentVolume) && !string.IsNullOrEmpty(currentVolume))
         {
             string volumeLabel = currentVolume;
@@ -40,21 +40,23 @@ public static class Menu
                 }
             }
 
-            mainMenu.AddOption(Instance.Localizer.ForPlayer(player, "mvp<currentvolume>", volumeLabel), (p, o) => { }, true);
+            mainMenu.AddItem(Instance.Localizer.ForPlayer(player, "mvp<currentvolume>", volumeLabel), (p, o) => { }, true);
         }
-        mainMenu.AddOption(" ", (p, o) => { }, true);
+
+        mainMenu.AddItem(" ", (p, o) => { }, true);
 
         if (Instance.playerMVPCookies.TryGetValue(player, out string? activeMvp) && !string.IsNullOrEmpty(activeMvp))
         {
-            mainMenu.AddOption(Instance.Localizer.ForPlayer(player, "mvp<remove>"), (p, option) =>
+            mainMenu.AddItem(Instance.Localizer.ForPlayer(player, "mvp<remove>"), (p, option) =>
             {
-                ScreenMenu confirmMenu = new ScreenMenu(Instance.Localizer.ForPlayer(p, "mvp<remove.confirm>"), Instance)
+                var confirmMenu = new CS2ScreenMenuAPI.Menu(p, Instance)
                 {
+                    Title = Instance.Localizer.ForPlayer(p, "mvp<remove.confirm>"),
                     IsSubMenu = true,
                     ParentMenu = mainMenu,
                 };
 
-                confirmMenu.AddOption(Instance.Localizer.ForPlayer(p, "remove<yes>"), (p, option) =>
+                confirmMenu.AddItem(Instance.Localizer.ForPlayer(p, "remove<yes>"), (p, option) =>
                 {
                     if (Instance.CLIENT_PREFS_API != null && Instance.MVPCookie != -1)
                     {
@@ -64,22 +66,26 @@ public static class Menu
                             Instance.playerMVPCookies.Remove(p);
                         }
                         p.PrintToChat(Instance.Localizer["prefix"] + Instance.Localizer["mvp.removed"]);
-                        MenuAPI.CloseActiveMenu(p);
+                        confirmMenu.Close(p);
                     }
                 });
-                confirmMenu.AddOption(Instance.Localizer.ForPlayer(p, "remove<no>"), (p, option) =>
+
+                confirmMenu.AddItem(Instance.Localizer.ForPlayer(p, "remove<no>"), (p, option) =>
                 {
-                    MenuAPI.OpenMenu(Instance, p, mainMenu);
+                    confirmMenu.Close(p);
                 });
-                confirmMenu.Open(p);
+
+                confirmMenu.Display();
             });
         }
-        mainMenu.AddOption(Instance.Localizer.ForPlayer(player, "volume<option>"), (p, option) =>
+
+        mainMenu.AddItem(Instance.Localizer.ForPlayer(player, "volume<option>"), (p, option) =>
         {
-            ScreenMenu volumeMenu = new ScreenMenu(Instance.Localizer.ForPlayer(p, "volume<menu>"), Instance)
+            var volumeMenu = new CS2ScreenMenuAPI.Menu(p, Instance)
             {
+                Title = Instance.Localizer.ForPlayer(p, "volume<menu>"),
                 IsSubMenu = true,
-                ParentMenu = mainMenu
+                ParentMenu = mainMenu,
             };
 
             foreach (var kvp in Instance.Config.Settings.VolumeSettings)
@@ -87,7 +93,7 @@ public static class Menu
                 float volume = kvp.Value;
                 string display = kvp.Key;
 
-                volumeMenu.AddOption(display, (p, o) =>
+                volumeMenu.AddItem(display, (p, o) =>
                 {
                     if (Instance.CLIENT_PREFS_API != null && Instance.VolumeCookie != -1)
                     {
@@ -97,15 +103,17 @@ public static class Menu
                     }
                 });
             }
-            volumeMenu.Open(player);
+
+            volumeMenu.Display();
         });
 
-        mainMenu.AddOption(Instance.Localizer.ForPlayer(player, "mvp<option>"), (p, o) =>
+        mainMenu.AddItem(Instance.Localizer.ForPlayer(player, "mvp<option>"), (p, o) =>
         {
-            ScreenMenu categoryMenu = new ScreenMenu(Instance.Localizer.ForPlayer(p, "categories<menu>"), Instance)
+            var categoryMenu = new CS2ScreenMenuAPI.Menu(p, Instance)
             {
+                Title = Instance.Localizer.ForPlayer(p, "categories<menu>"),
                 IsSubMenu = true,
-                ParentMenu = mainMenu
+                ParentMenu = mainMenu,
             };
 
             foreach (var category in Instance.Config.MVPSettings)
@@ -123,12 +131,13 @@ public static class Menu
 
                 if (hasValidMVPs)
                 {
-                    categoryMenu.AddOption(category.Key, (categoryPlayer, categoryOption) =>
+                    categoryMenu.AddItem(category.Key, (categoryPlayer, categoryOption) =>
                     {
-                        ScreenMenu mvpsMenu = new ScreenMenu(category.Key, Instance)
+                        var mvpsMenu = new CS2ScreenMenuAPI.Menu(categoryPlayer, Instance)
                         {
+                            Title = category.Key,
                             IsSubMenu = true,
-                            ParentMenu = categoryMenu
+                            ParentMenu = categoryMenu,
                         };
 
                         foreach (var mvpEntry in category.Value)
@@ -136,15 +145,17 @@ public static class Menu
                             var mvpSettings = mvpEntry.Value;
                             if (ValidatePlayerForMVP(categoryPlayer, mvpSettings))
                             {
-                                mvpsMenu.AddOption(mvpSettings.MVPName, (mvpPlayer, mvpOption) =>
+                                mvpsMenu.AddItem(mvpSettings.MVPName, (mvpPlayer, mvpOption) =>
                                 {
-                                    ScreenMenu mvpActionMenu = new ScreenMenu(Instance.Localizer.ForPlayer(mvpPlayer, "mvp<equip>", mvpSettings.MVPName), Instance)
+                                    var mvpActionMenu = new CS2ScreenMenuAPI.Menu(mvpPlayer, Instance)
                                     {
+                                        Title = Instance.Localizer.ForPlayer(mvpPlayer, "mvp<equip>", mvpSettings.MVPName),
                                         IsSubMenu = true,
                                         ParentMenu = mvpsMenu,
+                                        HasExitButon = true
                                     };
 
-                                    mvpActionMenu.AddOption(Instance.Localizer.ForPlayer(mvpPlayer, "equip<yes>"), (actionPlayer, actionOption) =>
+                                    mvpActionMenu.AddItem(Instance.Localizer.ForPlayer(mvpPlayer, "equip<yes>"), (actionPlayer, actionOption) =>
                                     {
                                         string newValue = $"{mvpSettings.MVPName};{mvpSettings.MVPSound}";
                                         if (Instance.CLIENT_PREFS_API != null && Instance.MVPCookie != -1)
@@ -154,9 +165,10 @@ public static class Menu
                                             actionPlayer.PrintToChat(Instance.Localizer["prefix"] + Instance.Localizer["mvp.equipped", mvpSettings.MVPName]);
                                         }
                                     });
+
                                     if (mvpSettings.EnablePreview)
                                     {
-                                        mvpActionMenu.AddOption(Instance.Localizer.ForPlayer(mvpPlayer, "preview<option>"), (actionPlayer, actionOption) =>
+                                        mvpActionMenu.AddItem(Instance.Localizer.ForPlayer(mvpPlayer, "preview<option>"), (actionPlayer, actionOption) =>
                                         {
                                             float volume = 0;
                                             if (Instance.playerVolumeCookies.TryGetValue(actionPlayer, out string? volumeStr) && !string.IsNullOrEmpty(volumeStr))
@@ -176,34 +188,40 @@ public static class Menu
                                         });
                                     }
 
-                                    mvpActionMenu.Open(mvpPlayer);
+                                    mvpActionMenu.Display();
                                 });
                             }
                         }
 
-                        mvpsMenu.Open(categoryPlayer);
+                        mvpsMenu.Display();
                     });
                 }
             }
 
-            categoryMenu.Open(player);
+            categoryMenu.Display();
         });
 
-        mainMenu.Open(player);
+        mainMenu.HasExitButon = true;
+        mainMenu.Display();
     }
+
     public static void DisplayVolume(CCSPlayerController player)
     {
         if (player == null)
             return;
 
-        ScreenMenu volumeMenu = new ScreenMenu(Instance.Localizer.ForPlayer(player, "volume<menu>"), Instance);
+        var volumeMenu = new CS2ScreenMenuAPI.Menu(player, Instance)
+        {
+            Title = Instance.Localizer.ForPlayer(player, "volume<menu>"),
+
+        };
 
         foreach (var kvp in Instance.Config.Settings.VolumeSettings)
         {
             float volume = kvp.Value;
             string display = kvp.Key;
 
-            volumeMenu.AddOption(display, (p, option) =>
+            volumeMenu.AddItem(display, (p, option) =>
             {
                 if (Instance.CLIENT_PREFS_API != null && Instance.VolumeCookie != -1)
                 {
@@ -213,6 +231,7 @@ public static class Menu
                 }
             });
         }
-        volumeMenu.Open(player);
+
+        volumeMenu.Display();
     }
 }
