@@ -25,6 +25,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Reference Include="T3MenuSharedAPI">
+			<HintPath>..\T3MenuSharedAPI.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
 		
 		<None Update="Tomlyn.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

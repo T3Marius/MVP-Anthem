@@ -3,16 +3,17 @@ using static MVPAnthem.Lib;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Utils;
+using CS2ScreenMenuAPI;
 namespace MVPAnthem;
 
-public static class Menu
+public static class ScreenMenu
 {
     public static void DisplayMVP(CCSPlayerController player)
     {
         if (player == null)
             return;
-        
-        var mainMenu = new CS2ScreenMenuAPI.Menu(player, Instance)
+
+        var mainMenu = new Menu(player, Instance)
         {
             Title = Instance.Localizer.ForPlayer(player, "mvp<mainmenu>"),
             ShowDisabledOptionNum = false,
@@ -49,7 +50,7 @@ public static class Menu
         {
             mainMenu.AddItem(Instance.Localizer.ForPlayer(player, "mvp<remove>"), (p, option) =>
             {
-                var confirmMenu = new CS2ScreenMenuAPI.Menu(p, Instance)
+                var confirmMenu = new Menu(p, Instance)
                 {
                     Title = Instance.Localizer.ForPlayer(p, "mvp<remove.confirm>"),
                     IsSubMenu = true,
@@ -81,7 +82,7 @@ public static class Menu
 
         mainMenu.AddItem(Instance.Localizer.ForPlayer(player, "volume<option>"), (p, option) =>
         {
-            var volumeMenu = new CS2ScreenMenuAPI.Menu(p, Instance)
+            var volumeMenu = new Menu(p, Instance)
             {
                 Title = Instance.Localizer.ForPlayer(p, "volume<menu>"),
                 IsSubMenu = true,
@@ -109,7 +110,7 @@ public static class Menu
 
         mainMenu.AddItem(Instance.Localizer.ForPlayer(player, "mvp<option>"), (p, o) =>
         {
-            var categoryMenu = new CS2ScreenMenuAPI.Menu(p, Instance)
+            var categoryMenu = new Menu(p, Instance)
             {
                 Title = Instance.Localizer.ForPlayer(p, "categories<menu>"),
                 IsSubMenu = true,
@@ -133,7 +134,7 @@ public static class Menu
                 {
                     categoryMenu.AddItem(category.Key, (categoryPlayer, categoryOption) =>
                     {
-                        var mvpsMenu = new CS2ScreenMenuAPI.Menu(categoryPlayer, Instance)
+                        var mvpsMenu = new Menu(categoryPlayer, Instance)
                         {
                             Title = category.Key,
                             IsSubMenu = true,
@@ -147,7 +148,7 @@ public static class Menu
                             {
                                 mvpsMenu.AddItem(mvpSettings.MVPName, (mvpPlayer, mvpOption) =>
                                 {
-                                    var mvpActionMenu = new CS2ScreenMenuAPI.Menu(mvpPlayer, Instance)
+                                    var mvpActionMenu = new Menu(mvpPlayer, Instance)
                                     {
                                         Title = Instance.Localizer.ForPlayer(mvpPlayer, "mvp<equip>", mvpSettings.MVPName),
                                         IsSubMenu = true,
@@ -210,7 +211,7 @@ public static class Menu
         if (player == null)
             return;
 
-        var volumeMenu = new CS2ScreenMenuAPI.Menu(player, Instance)
+        var volumeMenu = new Menu(player, Instance)
         {
             Title = Instance.Localizer.ForPlayer(player, "volume<menu>"),
 

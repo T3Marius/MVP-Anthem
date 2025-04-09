@@ -22,13 +22,33 @@ public static class Commands
         if (player == null)
             return;
 
-        Menu.DisplayMVP(player);
+        switch (Instance.Config.Settings.MenuType)
+        {
+            case "screen":
+            case "screenmenu":
+                ScreenMenu.DisplayMVP(player);
+                break;
+            case "t3menu":
+            case "t3":
+                T3Menu.DisplayMVP(player);
+                break;
+        }
     }
     public static void Command_Volume(CCSPlayerController? player, CommandInfo info)
     {
-        if (player == null) 
+        if (player == null)
             return;
 
-        Menu.DisplayVolume(player);
+        switch (Instance.Config.Settings.MenuType)
+        {
+            case "screen":
+            case "screenmenu":
+                ScreenMenu.DisplayVolume(player);
+                break;
+            case "t3menu":
+            case "t3":
+                T3Menu.DisplayVolume(player);
+                break;
+        }
     }
 }

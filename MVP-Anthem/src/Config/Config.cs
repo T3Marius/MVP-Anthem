@@ -50,6 +50,7 @@ public class PluginConfig
 
 public class Settings_Config
 {
+    public string MenuType { get; set; } = "screen";
     public List<string> SoundEventFiles { get; set; } = [""];
     public float DefaultVolume { get; set; } = 0.4f;
     public Dictionary<string, float> VolumeSettings { get; set; } = new()
@@ -141,9 +142,10 @@ public static class ConfigLoader
     {
         var settings = new Settings_Config
         {
+            MenuType = settingsTable["MenuType"].ToString()!,
             DefaultVolume = float.Parse(settingsTable["DefaultVolume"].ToString()!),
             GiveRandomMVP = bool.Parse(settingsTable["GiveRandomMVP"].ToString()!),
-            DisablePlayerDefaultMVP = bool.Parse(settingsTable["DisablePlayerDefaultMVP"].ToString()!)
+            DisablePlayerDefaultMVP = bool.Parse(settingsTable["DisablePlayerDefaultMVP"].ToString()!),
         };
 
         if (settingsTable.ContainsKey("SoundEventFiles"))
@@ -243,6 +245,7 @@ public static class ConfigLoader
     # MVP Configuration.
 
     [Settings]
+    MenuType = ""screen""            # screen is the default menu, if you don't wanna use t3menu don't even add the shared of it.
     DefaultVolume = 0.4             # this volume will be set to players who don't have one setted.
     GiveRandomMVP = true            # when a player with no mvp joins the server, a random MVP is assinged to him.
     DisablePlayerDefaultMVP = true  # with this on true the player mvp from steam will be disabled.
