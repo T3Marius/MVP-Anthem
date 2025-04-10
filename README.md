@@ -12,52 +12,48 @@
 # Basic Config:
 ```toml
 
-# MVP Configuration.
 
-[Settings]
-DefaultVolume = 0.4             # this volume will be set to players who don't have one setted.
-GiveRandomMVP = true            # when a player with no mvp joins the server, a random MVP is assinged to him.
-DisablePlayerDefaultMVP = true  # with this on true the player mvp from steam will be disabled.
-SoundEventFiles = ["soundevents/soundevents_zp.vsndevts", "soundevents/mvp_anthem.vsndevts"]            # VERY IMPORTANT: In order for the sounds to work you need to add the path for soundevent file here.
+    # MVP Configuration.
 
-[Settings.VolumeSettings]
-"100%" = 1.0                  # '100%' is how it shown in the menu '1.0' is the actual volume.
-"80%" = 0.8
-"60%" = 0.6
-"40%" = 0.4
-"20%" = 0.2
-"0%" = 0.0
+    [Settings]
+    MenuType = "screen"  # screen, t3           # screen is the default menu, if you don't wanna use t3menu don't even add the shared of it.
+    DefaultVolume = 0.4             # this volume will be set to players who don't have one setted.
+    GiveRandomMVP = true            # when a player with no mvp joins the server, a random MVP is assinged to him.
+    DisablePlayerDefaultMVP = true  # with this on true the player mvp from steam will be disabled.
+    SoundEventFiles = ["soundevents/mvp_anthem.vsndevts"]            # VERY IMPORTANT: In order for the sounds to work you need to add the path for soundevent file here.
+    VolumeSettings = [100, 80, 60, 40, 20, 0]
 
-[Commands]
-MVPCommands = ["mvp", "music"]        # Opens the MVP Menu
-VolumeCommands = ["mvpvol", "vol"]    # Opens the Volume Menu (this is just a separate command)
+    [Commands]
+    MVPCommands = ["mvp", "music"]        # Opens the MVP Menu
+    VolumeCommands = ["mvpvol", "vol"]    # Opens the Volume Menu (this is just a separate command)
 
-[Timer]
-CenterHtmlDuration = 10.0
-CenterDuration = 10.0
-AlertDuration = 10.0
+    [Timer]
+    CenterHtmlDuration = 10.0
+    CenterDuration = 10.0
+    AlertDuration = 10.0
 
-[MVPSettings."PUBLIC MVP"."mvp.1"] # 'PUBLIC MVP' is the category which will be shown in the menu. 'mvp.1' is the key which u set the message too.
-MVPName = "Flawless"
-MVPSound = "MVP_Flawless"
-EnablePreview = true
-ShowChatMessage = true
-ShowCenterMessage = false
-ShowAlertMessage = false
-ShowHtmlMessage = true
-SteamID = ""
-Flags = []
+    [MVPSettings."PUBLIC MVP"."mvp.1"] # 'PUBLIC MVP' is the category which will be shown in the menu. 'mvp.1' is the key which u set the message to in lang folder.
+    MVPName = "Flawless"                 # This will be shown in the menu.
+    MVPSound = "MVP_Flawless"            # This is the soundevent name. With this the sound will play.
+    EnablePreview = true
+    ShowChatMessage = true
+    ShowCenterMessage = false
+    ShowAlertMessage = false
+    ShowHtmlMessage = true
+    SteamID = ""
+    Flags = []
 
-[MVPSettings."PUBLIC MVP"."mvp.2"]
-MVPName = "Protection Charm"
-MVPSound = "MVP_ProtectionCharm"
-EnablePreview = true
-ShowChatMessage = true
-ShowCenterMessage = false
-ShowAlertMessage = false
-ShowHtmlMessage = true
-SteamID = ""
-Flags = []
+    [MVPSettings."PUBLIC MVP"."mvp.2"]
+    MVPName = "Protection Charm"
+    MVPSound = "MVP_ProtectionCharm"
+    EnablePreview = true
+    ShowChatMessage = true
+    ShowCenterMessage = false
+    ShowAlertMessage = false
+    ShowHtmlMessage = true
+    SteamID = ""
+    Flags = []
+    
 
 ```
 
