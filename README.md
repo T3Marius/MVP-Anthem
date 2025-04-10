@@ -4,7 +4,7 @@
 - **[** [**CounterStrikeSharp**](https://github.com/roflmuffin/CounterStrikeSharp) **]**
 - **[** [**MultiAddonManager**](https://github.com/Source2ZE/MultiAddonManager) **]**
 - **[** [**CS2ScreenMenuAPI**](https://github.com/T3Marius/CS2ScreenMenuAPI) **]**
-- - **[** [**T3Menu-API**](https://github.com/T3Marius/T3Menu-API) **]**
+- **[** [**T3Menu-API**](https://github.com/T3Marius/T3Menu-API) **]**
 - **[** [**ClientPrefsAPI**](https://github.com/Cruze03/Clientprefs) **]**
 
 ## You use for testing my WorkshopAddon: **[** [**Workshop**](https://steamcommunity.com/sharedfiles/filedetails/?id=3450055137) **]**
