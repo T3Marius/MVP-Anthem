@@ -10,7 +10,7 @@ public partial class MVPAnthem : BasePlugin
 {
     public override string ModuleAuthor => "T3Marius";
     public override string ModuleName => "MVP-Anthem";
-    public override string ModuleVersion => "1.0.2";
+    public override string ModuleVersion => "1.0.3";
     public PluginConfig Config { get; set; } = new PluginConfig();
     public static MVPAnthem Instance { get; set; } = new MVPAnthem();
     public IT3MenuManager? MenuManager;
