@@ -1,5 +1,7 @@
 ﻿using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Core.Capabilities;
+using CounterStrikeSharp.API.Modules.Commands;
 using T3MenuSharedApi;
 
 namespace MVPAnthem;
@@ -41,4 +43,5 @@ public partial class MVPAnthem : BasePlugin
         UnloadClientprefis();
         Events.Dispose();
     }
+
 }

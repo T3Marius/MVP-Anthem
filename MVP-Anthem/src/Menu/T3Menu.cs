@@ -3,6 +3,8 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using CounterStrikeSharp.API.Core.Translations;
 using static MVPAnthem.Lib;
+using Microsoft.VisualBasic.FileIO;
+using Microsoft.Extensions.Logging;
 
 public static class T3Menu
 {
@@ -28,27 +30,25 @@ public static class T3Menu
             string volumeLabel = currentVolume;
             if (float.TryParse(currentVolume, out float volumeValue))
             {
-                foreach (var kvp in Instance.Config.Settings.VolumeSettings)
-                {
-                    if (Math.Abs(kvp.Value - volumeValue) < 0.01f)
-                    {
-                        volumeLabel = kvp.Key;
-                        break;
-                    }
-                }
-            }
+                int volumePercentage = (int)(volumeValue * 100);
 
+                int closestValue = Instance.Config.Settings.VolumeSettings
+                    .OrderBy(v => Math.Abs(v - volumePercentage))
+                    .FirstOrDefault();
+
+                volumeLabel = closestValue + "%";
+            }
             mainMenu.AddTextOption(Instance.Localizer.ForPlayer(player, "mvp<currentvolume>", volumeLabel));
         }
 
         if (Instance.playerMVPCookies.TryGetValue(player, out string? activeMvp) && !string.IsNullOrEmpty(activeMvp))
         {
-            mainMenu.Add(Instance.Localizer.ForPlayer(player, "mvp<remove>"), (p, option) =>
+            mainMenu.AddOption(Instance.Localizer.ForPlayer(player, "mvp<remove>"), (p, option) =>
             {
                 var confirmMenu = manager.CreateMenu(Instance.Localizer.ForPlayer(p, "mvp<remove.confirm>"), isSubMenu: true);
                 confirmMenu.ParentMenu = mainMenu;
 
-                confirmMenu.Add(Instance.Localizer.ForPlayer(p, "remove<yes>"), (p, option) =>
+                confirmMenu.AddOption(Instance.Localizer.ForPlayer(p, "remove<yes>"), (p, option) =>
                 {
                     if (Instance.CLIENT_PREFS_API != null && Instance.MVPCookie != -1)
                     {
@@ -62,7 +62,7 @@ public static class T3Menu
                     }
                 });
 
-                confirmMenu.Add(Instance.Localizer.ForPlayer(p, "remove<no>"), (p, option) =>
+                confirmMenu.AddOption(Instance.Localizer.ForPlayer(p, "remove<no>"), (p, option) =>
                 {
                     manager.CloseMenu(p);
                 });
@@ -70,33 +70,49 @@ public static class T3Menu
                 manager.OpenSubMenu(player, confirmMenu);
             });
         }
-
-        mainMenu.Add(Instance.Localizer.ForPlayer(player, "volume<option>"), (p, option) =>
+        mainMenu.AddOption(Instance.Localizer.ForPlayer(player, "volume<option>"), (p, option) =>
         {
             var volumeMenu = manager.CreateMenu(Instance.Localizer.ForPlayer(p, "volume<menu>"), isSubMenu: true);
             volumeMenu.ParentMenu = mainMenu;
+            List<object> volumeValues = Instance.Config.Settings.VolumeSettings.Cast<object>().ToList();
 
-            foreach (var kvp in Instance.Config.Settings.VolumeSettings)
+            object defaultVolume = volumeValues.FirstOrDefault() ?? 100;
+
+            if (Instance.CLIENT_PREFS_API != null && Instance.VolumeCookie != -1 &&
+                Instance.playerVolumeCookies.TryGetValue(p, out string? savedVolume))
             {
-                float volume = kvp.Value;
-                string display = kvp.Key;
-
-
-
-                volumeMenu.Add(display, (p, o) =>
+                if (float.TryParse(savedVolume, out float savedVolumeValue))
                 {
+                    int savedPercentage = (int)(savedVolumeValue * 100);
+
+                    int closestValue = Instance.Config.Settings.VolumeSettings
+                        .OrderBy(v => Math.Abs(v - savedPercentage))
+                        .FirstOrDefault();
+
+                    defaultVolume = closestValue;
+                }
+            }
+
+            volumeMenu.AddSliderOption(Instance.Localizer.ForPlayer(p, "slider<volume>"), volumeValues, defaultVolume, 3, (p, o, index) =>
+            {
+                if (o is IT3Option sliderOption && sliderOption.DefaultValue != null)
+                {
+                    int volumePercentage = Convert.ToInt32(sliderOption.DefaultValue);
+                    float volumeDecimal = volumePercentage / 100.0f;
+
                     if (Instance.CLIENT_PREFS_API != null && Instance.VolumeCookie != -1)
                     {
-                        Instance.CLIENT_PREFS_API.SetPlayerCookie(p, Instance.VolumeCookie, volume.ToString());
-                        Instance.playerVolumeCookies[p] = volume.ToString();
-                        p.PrintToChat(Instance.Localizer["prefix"] + Instance.Localizer["volume.selected", display]);
+                        Instance.CLIENT_PREFS_API.SetPlayerCookie(p, Instance.VolumeCookie, volumeDecimal.ToString());
+                        Instance.playerVolumeCookies[p] = volumeDecimal.ToString();
+                        p.PrintToChat(Instance.Localizer["prefix"] + Instance.Localizer["volume.selected", volumePercentage + "%"]);
                     }
-                });
-            }
+                }
+            });
+
             manager.OpenSubMenu(p, volumeMenu);
         });
 
-        mainMenu.Add(Instance.Localizer.ForPlayer(player, "mvp<option>"), (p, o) =>
+        mainMenu.AddOption(Instance.Localizer.ForPlayer(player, "mvp<option>"), (p, o) =>
         {
             var categoryMenu = manager.CreateMenu(Instance.Localizer.ForPlayer(p, "categories<menu>"), isSubMenu: true);
             categoryMenu.ParentMenu = mainMenu;
@@ -116,7 +132,7 @@ public static class T3Menu
 
                 if (hasValidMVPs)
                 {
-                    categoryMenu.Add(category.Key, (categoryPlayer, categoryOption) =>
+                    categoryMenu.AddOption(category.Key, (categoryPlayer, categoryOption) =>
                     {
                         var mvpsMenu = manager.CreateMenu(category.Key, isSubMenu: true);
                         mvpsMenu.ParentMenu = categoryMenu;
@@ -126,12 +142,12 @@ public static class T3Menu
                             var mvpSettings = mvpEntry.Value;
                             if (ValidatePlayerForMVP(categoryPlayer, mvpSettings))
                             {
-                                mvpsMenu.Add(mvpSettings.MVPName, (mvpPlayer, mvpOption) =>
+                                mvpsMenu.AddOption(mvpSettings.MVPName, (mvpPlayer, mvpOption) =>
                                 {
                                     var mvpActionMenu = manager.CreateMenu(Instance.Localizer.ForPlayer(mvpPlayer, "mvp<equip>", mvpSettings.MVPName), isSubMenu: true);
                                     mvpActionMenu.ParentMenu = mvpsMenu;
 
-                                    mvpActionMenu.Add(Instance.Localizer.ForPlayer(mvpPlayer, "equip<yes>"), (actionPlayer, actionOption) =>
+                                    mvpActionMenu.AddOption(Instance.Localizer.ForPlayer(mvpPlayer, "equip<yes>"), (actionPlayer, actionOption) =>
                                     {
                                         string newValue = $"{mvpSettings.MVPName};{mvpSettings.MVPSound}";
                                         if (Instance.CLIENT_PREFS_API != null && Instance.MVPCookie != -1)
@@ -144,7 +160,7 @@ public static class T3Menu
 
                                     if (mvpSettings.EnablePreview)
                                     {
-                                        mvpActionMenu.Add(Instance.Localizer.ForPlayer(mvpPlayer, "preview<option>"), (actionPlayer, actionOption) =>
+                                        mvpActionMenu.AddOption(Instance.Localizer.ForPlayer(mvpPlayer, "preview<option>"), (actionPlayer, actionOption) =>
                                         {
                                             float volume = 0;
                                             if (Instance.playerVolumeCookies.TryGetValue(actionPlayer, out string? volumeStr) && !string.IsNullOrEmpty(volumeStr))
@@ -189,23 +205,39 @@ public static class T3Menu
 
         var volumeMenu = manager.CreateMenu(Instance.Localizer.ForPlayer(player, "volume<menu>"));
 
-        foreach (var kvp in Instance.Config.Settings.VolumeSettings)
+        List<object> volumeValues = Instance.Config.Settings.VolumeSettings.Cast<object>().ToList();
+        object defaultVolume = volumeValues.FirstOrDefault() ?? 100;
+
+        if (Instance.CLIENT_PREFS_API != null && Instance.VolumeCookie != -1 &&
+            Instance.playerVolumeCookies.TryGetValue(player, out string? savedVolume))
         {
-            float volume = kvp.Value;
-            string display = kvp.Key;
-
-
-
-            volumeMenu.Add(display, (p, o) =>
+            if (float.TryParse(savedVolume, out float savedVolumeValue))
             {
+                int savedPercentage = (int)(savedVolumeValue * 100);
+
+                int closestValue = Instance.Config.Settings.VolumeSettings
+                    .OrderBy(v => Math.Abs(v - savedPercentage))
+                    .FirstOrDefault();
+
+                defaultVolume = closestValue;
+            }
+        }
+
+        volumeMenu.AddSliderOption(Instance.Localizer.ForPlayer(player, "slider<volume>"), volumeValues, defaultVolume, 3, (p, o, index) =>
+        {
+            if (o is IT3Option sliderOption && sliderOption.DefaultValue != null)
+            {
+                int volumePercentage = Convert.ToInt32(sliderOption.DefaultValue);
+                float volumeDecimal = volumePercentage / 100.0f;
+
                 if (Instance.CLIENT_PREFS_API != null && Instance.VolumeCookie != -1)
                 {
-                    Instance.CLIENT_PREFS_API.SetPlayerCookie(p, Instance.VolumeCookie, volume.ToString());
-                    Instance.playerVolumeCookies[p] = volume.ToString();
-                    p.PrintToChat(Instance.Localizer["prefix"] + Instance.Localizer["volume.selected", display]);
+                    Instance.CLIENT_PREFS_API.SetPlayerCookie(p, Instance.VolumeCookie, volumeDecimal.ToString());
+                    Instance.playerVolumeCookies[p] = volumeDecimal.ToString();
+                    p.PrintToChat(Instance.Localizer["prefix"] + Instance.Localizer["volume.selected", volumePercentage + "%"]);
                 }
-            });
-        }
+            }
+        });
         manager.OpenMainMenu(player, volumeMenu);
     }
 }

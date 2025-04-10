@@ -31,16 +31,14 @@ public static class ScreenMenu
             string volumeLabel = currentVolume;
             if (float.TryParse(currentVolume, out float volumeValue))
             {
-                foreach (var kvp in Instance.Config.Settings.VolumeSettings)
-                {
-                    if (Math.Abs(kvp.Value - volumeValue) < 0.01f)
-                    {
-                        volumeLabel = kvp.Key;
-                        break;
-                    }
-                }
-            }
+                int volumePercentage = (int)(volumeValue * 100);
 
+                int closestValue = Instance.Config.Settings.VolumeSettings
+                    .OrderBy(v => Math.Abs(v - volumePercentage))
+                    .FirstOrDefault();
+
+                volumeLabel = closestValue + "%";
+            }
             mainMenu.AddItem(Instance.Localizer.ForPlayer(player, "mvp<currentvolume>", volumeLabel), (p, o) => { }, true);
         }
 
@@ -89,18 +87,18 @@ public static class ScreenMenu
                 ParentMenu = mainMenu,
             };
 
-            foreach (var kvp in Instance.Config.Settings.VolumeSettings)
+            foreach (var volume in Instance.Config.Settings.VolumeSettings)
             {
-                float volume = kvp.Value;
-                string display = kvp.Key;
-
-                volumeMenu.AddItem(display, (p, o) =>
+                volumeMenu.AddItem(volume.ToString(), (p, o) =>
                 {
+                    int volumePercentage = Convert.ToInt32(volume / 100.0f);
+                    float volumeDecimal = volumePercentage / 100.0f;
+
                     if (Instance.CLIENT_PREFS_API != null && Instance.VolumeCookie != -1)
                     {
-                        Instance.CLIENT_PREFS_API.SetPlayerCookie(p, Instance.VolumeCookie, volume.ToString());
-                        Instance.playerVolumeCookies[p] = volume.ToString();
-                        p.PrintToChat(Instance.Localizer["prefix"] + Instance.Localizer["volume.selected", display]);
+                        Instance.CLIENT_PREFS_API.SetPlayerCookie(p, Instance.VolumeCookie, volumeDecimal.ToString());
+                        Instance.playerVolumeCookies[p] = volumeDecimal.ToString();
+                        p.PrintToChat(Instance.Localizer["prefix"] + Instance.Localizer["volume.selected", volumePercentage + "%"]);
                     }
                 });
             }
@@ -217,18 +215,18 @@ public static class ScreenMenu
 
         };
 
-        foreach (var kvp in Instance.Config.Settings.VolumeSettings)
+        foreach (var volume in Instance.Config.Settings.VolumeSettings)
         {
-            float volume = kvp.Value;
-            string display = kvp.Key;
-
-            volumeMenu.AddItem(display, (p, option) =>
+            volumeMenu.AddItem(volume.ToString(), (p, o) =>
             {
+                int volumePercentage = Convert.ToInt32(volume / 100.0f);
+                float volumeDecimal = volumePercentage / 100.0f;
+
                 if (Instance.CLIENT_PREFS_API != null && Instance.VolumeCookie != -1)
                 {
-                    Instance.CLIENT_PREFS_API.SetPlayerCookie(p, Instance.VolumeCookie, volume.ToString());
-                    Instance.playerVolumeCookies[p] = volume.ToString();
-                    p.PrintToChat(Instance.Localizer["prefix"] + Instance.Localizer["volume.selected", display]);
+                    Instance.CLIENT_PREFS_API.SetPlayerCookie(p, Instance.VolumeCookie, volumeDecimal.ToString());
+                    Instance.playerVolumeCookies[p] = volumeDecimal.ToString();
+                    p.PrintToChat(Instance.Localizer["prefix"] + Instance.Localizer["volume.selected", volumePercentage + "%"]);
                 }
             });
         }

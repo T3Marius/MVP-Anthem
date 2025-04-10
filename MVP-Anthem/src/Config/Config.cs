@@ -53,15 +53,7 @@ public class Settings_Config
     public string MenuType { get; set; } = "screen";
     public List<string> SoundEventFiles { get; set; } = [""];
     public float DefaultVolume { get; set; } = 0.4f;
-    public Dictionary<string, float> VolumeSettings { get; set; } = new()
-    {
-        { "100%", 1.0f },
-        { "80%", 0.8f },
-        { "60%", 0.6f },
-        { "40%", 0.4f },
-        { "20%", 0.2f },
-        { "0%", 0.0f },
-    };
+    public List<int> VolumeSettings = [100, 80, 60, 40, 20, 0];
     public bool GiveRandomMVP { get; set; } = true;
     public bool DisablePlayerDefaultMVP { get; set; } = true;
 }
@@ -155,12 +147,12 @@ public static class ConfigLoader
 
         if (settingsTable.ContainsKey("VolumeSettings"))
         {
-            var volumeTable = (TomlTable)settingsTable["VolumeSettings"];
-            settings.VolumeSettings = new Dictionary<string, float>();
+            var volumeArray = (TomlArray)settingsTable["VolumeSettings"];
+            settings.VolumeSettings = new List<int>();
 
-            foreach (var key in volumeTable.Keys)
+            foreach (var item in volumeArray)
             {
-                settings.VolumeSettings[key] = float.Parse(volumeTable[key].ToString()!);
+                settings.VolumeSettings.Add(int.Parse(item!.ToString()!));
             }
         }
 
@@ -250,14 +242,7 @@ public static class ConfigLoader
     GiveRandomMVP = true            # when a player with no mvp joins the server, a random MVP is assinged to him.
     DisablePlayerDefaultMVP = true  # with this on true the player mvp from steam will be disabled.
     SoundEventFiles = [""soundevents/mvp_anthem.vsndevts""]            # VERY IMPORTANT: In order for the sounds to work you need to add the path for soundevent file here.
-
-    [Settings.VolumeSettings]
-    ""100%"" = 1.0                  # '100%' is how it shown in the menu '1.0' is the actual volume. You can add as many as you want.
-    ""80%"" = 0.8
-    ""60%"" = 0.6
-    ""40%"" = 0.4
-    ""20%"" = 0.2
-    ""0%"" = 0.0
+    VolumeSettings = [100, 80, 60, 40, 20, 0]
 
     [Commands]
     MVPCommands = [""mvp"", ""music""]        # Opens the MVP Menu
