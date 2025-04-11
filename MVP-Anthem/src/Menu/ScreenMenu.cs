@@ -91,7 +91,7 @@ public static class ScreenMenu
             {
                 volumeMenu.AddItem(volume.ToString(), (p, o) =>
                 {
-                    int volumePercentage = Convert.ToInt32(volume / 100.0f);
+                    int volumePercentage = volume;
                     float volumeDecimal = volumePercentage / 100.0f;
 
                     if (Instance.CLIENT_PREFS_API != null && Instance.VolumeCookie != -1)
@@ -219,7 +219,7 @@ public static class ScreenMenu
         {
             volumeMenu.AddItem(volume.ToString(), (p, o) =>
             {
-                int volumePercentage = Convert.ToInt32(volume / 100.0f);
+                int volumePercentage = volume;
                 float volumeDecimal = volumePercentage / 100.0f;
 
                 if (Instance.CLIENT_PREFS_API != null && Instance.VolumeCookie != -1)
@@ -231,6 +231,7 @@ public static class ScreenMenu
             });
         }
 
+        volumeMenu.HasExitButon = true;
         volumeMenu.Display();
     }
 }
