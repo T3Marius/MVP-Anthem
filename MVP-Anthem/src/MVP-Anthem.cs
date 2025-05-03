@@ -1,7 +1,5 @@
 ﻿using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Core.Capabilities;
-using CounterStrikeSharp.API.Modules.Commands;
 using T3MenuSharedApi;
 
 namespace MVPAnthem;
@@ -10,7 +8,7 @@ public partial class MVPAnthem : BasePlugin
 {
     public override string ModuleAuthor => "T3Marius";
     public override string ModuleName => "MVP-Anthem";
-    public override string ModuleVersion => "1.0.4";
+    public override string ModuleVersion => "1.0.5";
     public PluginConfig Config { get; set; } = new PluginConfig();
     public static MVPAnthem Instance { get; set; } = new MVPAnthem();
     public IT3MenuManager? MenuManager;
