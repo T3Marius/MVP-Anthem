@@ -115,86 +115,92 @@ public static class ScreenMenu
                 ParentMenu = mainMenu,
             };
 
+            Dictionary<string, List<KeyValuePair<string, MVP_Settings>>> accessibleMVPsByCategory = new();
+
             foreach (var category in Instance.Config.MVPSettings)
             {
-                bool hasValidMVPs = false;
+                var accessibleMVPs = new List<KeyValuePair<string, MVP_Settings>>();
 
                 foreach (var mvpEntry in category.Value)
                 {
                     if (ValidatePlayerForMVP(player, mvpEntry.Value))
                     {
-                        hasValidMVPs = true;
-                        break;
+                        accessibleMVPs.Add(mvpEntry);
                     }
                 }
 
-                if (hasValidMVPs)
+                if (accessibleMVPs.Count > 0)
                 {
-                    categoryMenu.AddItem(category.Key, (categoryPlayer, categoryOption) =>
+                    accessibleMVPsByCategory[category.Key] = accessibleMVPs;
+                }
+            }
+
+            foreach (var categoryEntry in accessibleMVPsByCategory)
+            {
+                string categoryName = categoryEntry.Key;
+                var accessibleMVPs = categoryEntry.Value;
+
+                categoryMenu.AddItem(categoryName, (categoryPlayer, categoryOption) =>
+                {
+                    var mvpsMenu = new Menu(categoryPlayer, Instance)
                     {
-                        var mvpsMenu = new Menu(categoryPlayer, Instance)
-                        {
-                            Title = category.Key,
-                            IsSubMenu = true,
-                            ParentMenu = categoryMenu,
-                        };
+                        Title = categoryName,
+                        IsSubMenu = true,
+                        ParentMenu = categoryMenu,
+                    };
 
-                        foreach (var mvpEntry in category.Value)
+                    foreach (var mvpEntry in accessibleMVPs)
+                    {
+                        var mvpSettings = mvpEntry.Value;
+                        mvpsMenu.AddItem(mvpSettings.MVPName, (mvpPlayer, mvpOption) =>
                         {
-                            var mvpSettings = mvpEntry.Value;
-                            if (ValidatePlayerForMVP(categoryPlayer, mvpSettings))
+                            var mvpActionMenu = new Menu(mvpPlayer, Instance)
                             {
-                                mvpsMenu.AddItem(mvpSettings.MVPName, (mvpPlayer, mvpOption) =>
+                                Title = Instance.Localizer.ForPlayer(mvpPlayer, "mvp<equip>", mvpSettings.MVPName),
+                                IsSubMenu = true,
+                                ParentMenu = mvpsMenu,
+                                HasExitButon = true
+                            };
+
+                            mvpActionMenu.AddItem(Instance.Localizer.ForPlayer(mvpPlayer, "equip<yes>"), (actionPlayer, actionOption) =>
+                            {
+                                string newValue = $"{mvpSettings.MVPName};{mvpSettings.MVPSound}";
+                                if (Instance.CLIENT_PREFS_API != null && Instance.MVPCookie != -1)
                                 {
-                                    var mvpActionMenu = new Menu(mvpPlayer, Instance)
-                                    {
-                                        Title = Instance.Localizer.ForPlayer(mvpPlayer, "mvp<equip>", mvpSettings.MVPName),
-                                        IsSubMenu = true,
-                                        ParentMenu = mvpsMenu,
-                                        HasExitButon = true
-                                    };
+                                    Instance.CLIENT_PREFS_API.SetPlayerCookie(actionPlayer, Instance.MVPCookie, newValue);
+                                    Instance.playerMVPCookies[actionPlayer] = newValue;
+                                    actionPlayer.PrintToChat(Instance.Localizer["prefix"] + Instance.Localizer["mvp.equipped", mvpSettings.MVPName]);
+                                }
+                            });
 
-                                    mvpActionMenu.AddItem(Instance.Localizer.ForPlayer(mvpPlayer, "equip<yes>"), (actionPlayer, actionOption) =>
+                            if (mvpSettings.EnablePreview)
+                            {
+                                mvpActionMenu.AddItem(Instance.Localizer.ForPlayer(mvpPlayer, "preview<option>"), (actionPlayer, actionOption) =>
+                                {
+                                    float volume = 0;
+                                    if (Instance.playerVolumeCookies.TryGetValue(actionPlayer, out string? volumeStr) && !string.IsNullOrEmpty(volumeStr))
                                     {
-                                        string newValue = $"{mvpSettings.MVPName};{mvpSettings.MVPSound}";
-                                        if (Instance.CLIENT_PREFS_API != null && Instance.MVPCookie != -1)
-                                        {
-                                            Instance.CLIENT_PREFS_API.SetPlayerCookie(actionPlayer, Instance.MVPCookie, newValue);
-                                            Instance.playerMVPCookies[actionPlayer] = newValue;
-                                            actionPlayer.PrintToChat(Instance.Localizer["prefix"] + Instance.Localizer["mvp.equipped", mvpSettings.MVPName]);
-                                        }
-                                    });
-
-                                    if (mvpSettings.EnablePreview)
-                                    {
-                                        mvpActionMenu.AddItem(Instance.Localizer.ForPlayer(mvpPlayer, "preview<option>"), (actionPlayer, actionOption) =>
-                                        {
-                                            float volume = 0;
-                                            if (Instance.playerVolumeCookies.TryGetValue(actionPlayer, out string? volumeStr) && !string.IsNullOrEmpty(volumeStr))
-                                            {
-                                                float.TryParse(volumeStr, out volume);
-                                            }
-                                            if (volume > 0)
-                                            {
-                                                RecipientFilter filter = [actionPlayer];
-                                                actionPlayer.EmitSound(mvpSettings.MVPSound, filter, volume);
-                                                actionPlayer.PrintToChat(Instance.Localizer["prefix"] + Instance.Localizer["mvp.previewed", mvpSettings.MVPName]);
-                                            }
-                                            else
-                                            {
-                                                actionPlayer.PrintToChat(Instance.Localizer["prefix"] + Instance.Localizer["preview.no.volume"]);
-                                            }
-                                        });
+                                        float.TryParse(volumeStr, out volume);
                                     }
-
-                                    mvpActionMenu.Display();
+                                    if (volume > 0)
+                                    {
+                                        RecipientFilter filter = [actionPlayer];
+                                        actionPlayer.EmitSound(mvpSettings.MVPSound, filter, volume);
+                                        actionPlayer.PrintToChat(Instance.Localizer["prefix"] + Instance.Localizer["mvp.previewed", mvpSettings.MVPName]);
+                                    }
+                                    else
+                                    {
+                                        actionPlayer.PrintToChat(Instance.Localizer["prefix"] + Instance.Localizer["preview.no.volume"]);
+                                    }
                                 });
                             }
-                        }
 
-                        mvpsMenu.Display();
-                    });
-                }
+                            mvpActionMenu.Display();
+                        });
+                    }
+
+                    mvpsMenu.Display();
+                });
             }
 
             categoryMenu.Display();
