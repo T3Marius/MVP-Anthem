@@ -69,4 +69,4 @@ If you wanna ask about the plugin or support me contact me here:
 Discord: mariust3
 
 Donations:
-- **[** [**Revolut**](revolut.me/dynutrqxrj) **]**
+- **[** [**Revolut**](revolut.me/dumitrqxrj) **]**
