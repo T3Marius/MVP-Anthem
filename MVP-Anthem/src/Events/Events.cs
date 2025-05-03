@@ -4,6 +4,7 @@ using CounterStrikeSharp.API.Modules.Utils;
 using static MVPAnthem.MVPAnthem;
 using CounterStrikeSharp.API;
 using System.Text;
+using Microsoft.Extensions.Logging;
 
 namespace MVPAnthem;
 
@@ -31,24 +32,38 @@ public static class Events
     public static HookResult OnPlayerConnectFull(EventPlayerConnectFull @event, GameEventInfo info)
     {
         CCSPlayerController? player = @event.Userid;
-        if (player == null)
+        if (player == null || !player.IsValid)
             return HookResult.Continue;
+
+        int playerSlot = player.Slot;
 
         Instance.AddTimer(3.0f, () =>
         {
-            if (!Instance.playerVolumeCookies.TryGetValue(player, out string? currentVolume) && string.IsNullOrEmpty(currentVolume))
+            CCSPlayerController? currentPlayer = Utilities.GetPlayerFromSlot(playerSlot);
+
+            if (currentPlayer == null || !currentPlayer.IsValid || currentPlayer.Connected != PlayerConnectedState.PlayerConnected)
+                return;
+
+            if (!Instance.playerVolumeCookies.TryGetValue(currentPlayer, out string? currentVolume) || string.IsNullOrEmpty(currentVolume))
             {
                 float defaultVolume = Instance.Config.Settings.DefaultVolume;
-
                 if (Instance.CLIENT_PREFS_API != null && Instance.VolumeCookie != -1)
                 {
-                    Instance.CLIENT_PREFS_API.SetPlayerCookie(player, Instance.VolumeCookie, defaultVolume.ToString());
-                    Instance.playerMVPCookies[player] = defaultVolume.ToString();
+                    try
+                    {
+                        Instance.CLIENT_PREFS_API.SetPlayerCookie(currentPlayer, Instance.VolumeCookie, defaultVolume.ToString());
+                        Instance.playerVolumeCookies[currentPlayer] = defaultVolume.ToString();
+                    }
+                    catch (Exception ex)
+                    {
+                        Instance.Logger.LogError($"Failed to set volume cookie: {ex.Message}");
+                    }
                 }
             }
+
             if (Instance.Config.Settings.GiveRandomMVP)
             {
-                if (!Instance.playerMVPCookies.TryGetValue(player, out string? randomMvp) || string.IsNullOrEmpty(randomMvp))
+                if (!Instance.playerMVPCookies.TryGetValue(currentPlayer, out string? randomMvp) || string.IsNullOrEmpty(randomMvp))
                 {
                     var allMvps = Instance.Config.MVPSettings
                         .SelectMany(category => category.Value)
@@ -57,13 +72,19 @@ public static class Events
                     if (allMvps.Any())
                     {
                         var randomMvpEntry = allMvps[new Random().Next(allMvps.Count)];
-
                         string newMvpCookie = $"{randomMvpEntry.Value.MVPName};{randomMvpEntry.Value.MVPSound}";
 
                         if (Instance.CLIENT_PREFS_API != null && Instance.MVPCookie != -1)
                         {
-                            Instance.CLIENT_PREFS_API.SetPlayerCookie(player, Instance.MVPCookie, newMvpCookie);
-                            Instance.playerMVPCookies[player] = newMvpCookie;
+                            try
+                            {
+                                Instance.CLIENT_PREFS_API.SetPlayerCookie(currentPlayer, Instance.MVPCookie, newMvpCookie);
+                                Instance.playerMVPCookies[currentPlayer] = newMvpCookie;
+                            }
+                            catch (Exception ex)
+                            {
+                                Instance.Logger.LogError($"Failed to set MVP cookie: {ex.Message}");
+                            }
                         }
                     }
                 }
