@@ -1,5 +1,8 @@
 # MVP Anthem plugin
 
+# Video Tutorial For Creating Workshop Addon:
+- [CLICK HERE](https://youtu.be/ELnCfj0xGQ8)
+
 # Requirements
 - **[** [**CounterStrikeSharp**](https://github.com/roflmuffin/CounterStrikeSharp) **]**
 - **[** [**MultiAddonManager**](https://github.com/Source2ZE/MultiAddonManager) **]**
